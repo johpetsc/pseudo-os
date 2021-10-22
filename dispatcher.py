@@ -64,7 +64,7 @@ def main(processes, files):
         system.pre_allocated_file(lines[2+x].split(', '))
     # Cria ou deleta arquivo
     for x in range(1, len(lines) - (1 + int(lines[1]))):
-        system.allocate_file(x, lines[1 + int(lines[1]) + x].split(', '), processes)
+        system.allocate_file(x, lines[1 + int(lines[1]) + x].split(', '), queues.processes)
     # Apresenta o disco contendo os arquivos, sendo que os espaços em 0 não possuem
     system.disk_ocupation()
 
