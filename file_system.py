@@ -1,5 +1,3 @@
-import sys
-
 class FileSystem:
     def __init__(self):
         self.bit_map = []
@@ -22,6 +20,7 @@ class FileSystem:
         # Registra informações do arquivo como nome, local, tamanho e processo responsável por criá-lo, caso não possua o valor é -1
         self.files.append((file[0], int(file[1]), int(file[2][0:-1]), -1))
 
+    # Cria ou deleta arquivo
     def allocate_file(self, operation, file, processes):
         # Verifica se o processo existe
         current_process = (-1)
@@ -48,7 +47,7 @@ class FileSystem:
 
             else:
                 # Verifica se o processo é de tempo real ou criou o arquivo
-                if current_process[1] == current_file[3] or current_process[1] == 0:
+                if current_process[2] == current_file[3] or current_process[2] == 0:
                     # Caso sim o mapa de bits é atualizado e o arquivo é removido da lista
                     for x in range(current_file[2]):
                         self.bit_map[x+current_file[1]] = 0
@@ -95,31 +94,3 @@ class FileSystem:
                 disk[x] = file[0]
 
         print(disk)
-
-"""def main():
-    system = FileSystem()
-
-    f = open(sys.argv[2], 'r')
-    lines = f.readlines()
-
-    system.initialize_volume(int(lines[0]))
-
-    for i in range(int(lines[1])):
-        system.pre_allocated_file(lines[2+i].split(', '))
-
-    processes = [(0, 0), (1, 1)]
-    i = 1
-
-    for x in range(1, len(lines) - (1 + int(lines[1]))):
-        system.allocate_file(x, lines[1 + int(lines[1]) + x].split(', '), processes)
-    
-
-    print(system.bit_map)
-    print(system.files)
-    system.disk_ocupation()
-
-    f.close()
-
-if __name__ == '__main__':
-    main()
-"""

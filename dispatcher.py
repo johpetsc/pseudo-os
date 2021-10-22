@@ -1,6 +1,7 @@
 import sys
 from queues import Queues as q
 from memory import Memory as mem
+from file_system import FileSystem as fs
 
 def main(processes, files):
     exec_time = 0
@@ -51,8 +52,26 @@ def main(processes, files):
         queues.update_priorities(exec_time)
         exec_time+=1
 
+    processes = [[0,2,0,3,64,0,0,0,0], [1,8,0,2,64,0,0,0,0]]
+
+    lines = files.readlines()
+    # Inicializa o sistema de arquivos
+    system = fs()
+    # Define a quantidade de blocos no volume e inicia o mapa de bits
+    system.initialize_volume(int(lines[0]))
+    # Alocação de arquivos inicial
+    for x in range(int(lines[1])):
+        system.pre_allocated_file(lines[2+x].split(', '))
+    # Cria ou deleta arquivo
+    for x in range(1, len(lines) - (1 + int(lines[1]))):
+        system.allocate_file(x, lines[1 + int(lines[1]) + x].split(', '), processes)
+    # Apresenta o disco contendo os arquivos, sendo que os espaços em 0 não possuem
+    system.disk_ocupation()
+
+    files.close()
+
 
 if __name__ == "__main__":
     processes = sys.argv[1] # entrada de processos
-    files = sys.argv[2] # entrada de arquivos
+    files = open(sys.argv[2], 'r') # entrada de arquivos
     main(processes, files)
