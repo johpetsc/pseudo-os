@@ -2,13 +2,17 @@ import sys
 from queues import Queues as q
 from memory import Memory as mem
 from file_system import FileSystem as fs
+from process import ProcessList
 
 def main(processes, files):
     exec_time = 0
     memory = mem()
     # lista de processos usada enquanto o modulo de processos não estiver implementado
     # primeiro valor de cada lista representa o PID do processo
-    processes = [[0,2,0,10,64,0,0,0,0], [1,8,0,2,64,0,0,0,0], [2,1,1,1,64,0,0,0,0], [3,5,3,3,64,0,0,0,0], [4,10,2,9,64,0,0,0,0], [5,12,1,3,64,0,0,0,0], [6,6,2,1,64,0,0,0,0], [7,11,3,14,64,0,0,0,0]]
+
+    #processes = [[0,2,0,10,64,0,0,0,0], [1,8,0,2,64,0,0,0,0], [2,1,1,1,64,0,0,0,0], [3,5,3,3,64,0,0,0,0], [4,10,2,9,64,0,0,0,0], [5,12,1,3,64,0,0,0,0], [6,6,2,1,64,0,0,0,0], [7,11,3,14,64,0,0,0,0]]
+    processes = ProcessList(processes)
+
     queues = q(processes)
     init_processes = len(queues.processes)
     # loop principal, executa enquanto ainda existem processos não inicializados ou processos em alguma fila
@@ -72,7 +76,7 @@ def main(processes, files):
         queues.update_priorities(exec_time)
         exec_time+=1
 
-    processes = [[0,2,0,3,64,0,0,0,0], [1,8,0,2,64,0,0,0,0]]
+    processes = ProcessList("input/processes.txt")
 
     lines = files.readlines()
     # Inicializa o sistema de arquivos
@@ -92,6 +96,11 @@ def main(processes, files):
 
 
 if __name__ == "__main__":
+
+    if(len(sys.argv) != 3):
+        print("Usage: <processes file> <files file>")
+        exit()
+
     processes = sys.argv[1] # entrada de processos
     files = open(sys.argv[2], 'r') # entrada de arquivos
     main(processes, files)
