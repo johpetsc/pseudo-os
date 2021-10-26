@@ -21,9 +21,9 @@ class Memory:
                     allocated = 1
                     for x in range(start_block, start_block+contiguous_blocks):
                         self.mem[x] = process[0]
-                    return 1
+                    return start_block
             if(not allocated):
-                return 0
+                return -1
         else:
             start_block = 0
             for x in range(0, 64):
@@ -36,9 +36,9 @@ class Memory:
                     allocated = 1
                     for x in range(start_block, start_block+contiguous_blocks):
                         self.mem[x] = process[0]
-                    return 1
+                    return start_block
             if(not allocated):
-                return 0
+                return -1
 
     # remove processo da memória
     def free_memory(self, process):

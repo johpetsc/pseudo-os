@@ -5,78 +5,89 @@ from file_system import FileSystem as fs
 from process import ProcessList
 
 def main(processes, files):
-    exec_time = 0
-    memory = mem()
-    # lista de processos usada enquanto o modulo de processos não estiver implementado
-    # primeiro valor de cada lista representa o PID do processo
+    exec_time = 0 # tempo de execução em segundos
 
-    #processes = [[0,2,0,10,64,0,0,0,0], [1,8,0,2,64,0,0,0,0], [2,1,1,1,64,0,0,0,0], [3,5,3,3,64,0,0,0,0], [4,10,2,9,64,0,0,0,0], [5,12,1,3,64,0,0,0,0], [6,6,2,1,64,0,0,0,0], [7,11,3,14,64,0,0,0,0]]
-    processes = ProcessList(processes)
+    memory = mem() # módulo de memória
+    processes = ProcessList(processes) # módulo de processos
+    queues = q() #módulo de filas
 
-    queues = q(processes)
-    init_processes = len(queues.processes)
+    init_processes = processes.__len__() # quantidade de processos a serem executados
+
     # loop principal, executa enquanto ainda existem processos não inicializados ou processos em alguma fila
     while(init_processes or queues.max != 1000):
-        # verifica se o processos já está no tempo de inicialização
-        for process in queues.processes:
+        # verifica se o processos já está no tempo de inicialização  
+        for process in processes.list:
             if(process[1] == exec_time):
                 # se estiver, insere na fila
                 queues.create_queues(process)
                 init_processes-=1
-        # prints para debug, mostra o estado das listas
-        # print("exec_time: {}".format(exec_time))
-        # print("p0:")
-        # print(queues.priority0)
-        # print("p1:")
-        # print(queues.priority1)
-        # print("p2:")
-        # print(queues.priority2)
-        # print("p3:")
-        # print(queues.priority3)
+
+        # queues.print_queues(exec_time) # usar para debug
+
         # executa as filas pela ordem de prioridade, os processos são executados enquanto tem tempo de processador > 0
-        if(len(queues.priority0)>0):
+        # processos de tempo real
+        if(len(queues.priority0)>0): # prioridade 0
+            current = processes.get_process(queues.priority0[0]) # processo no início da fila
             # verifica se o processo já está na memória e executa um quantum
             if(queues.priority0[0] in memory.mem):
-                queues.processes[queues.priority0[0]][3]-=1
+                processes.exec_process(queues.priority0[0]) # executa instrução
             # caso não esteja na memória, verifica se é possível alocar o processo
-            elif(queues.processes[queues.priority0[0]][4] > 64):
-                queues.processes[queues.priority0[0]][3] = 0 # seta o tempo de processador igual a 0 para que o processo seja removido da fila
+            elif(current[4] > 64):
+                current[3] = 0 # seta o tempo de processador igual a 0 para que o processo seja removido da fila
             # se tiver espaço suficiente, aloca espaço e executa um quantum
-            elif(memory.allocate_memory(queues.processes[queues.priority0[0]])):
-                queues.processes[queues.priority0[0]][3]-=1
-        if(len(queues.priority1)>0):
+            else:
+                offset = memory.allocate_memory(current) # offset na alocação de memória
+                if(offset>=0): # offset é -1 quando não há espaço disponível
+                    processes.init_process(queues.priority0[0], offset) # inicia o processo
+                    processes.exec_process(queues.priority0[0]) # executa primeira instrução
+
+        # processos de usuário
+        if(len(queues.priority1)>0): # prioridade 1
+            current = processes.get_process(queues.priority1[0])
+            # verifica se o processo já está na memória e executa um quantum
             if(queues.priority1[0] in memory.mem):
-                queues.processes[queues.priority1[0]][3]-=1
-            elif(queues.processes[queues.priority1[0]][4] > 1000):
-                queues.processes[queues.priority1[0]][3] = 0
-            elif(memory.allocate_memory(queues.processes[queues.priority1[0]])):
-                queues.processes[queues.priority1[0]][3]-=1
-        elif(len(queues.priority2)>0):
+                processes.exec_process(queues.priority1[0]) # executa instrução
+            # caso não esteja na memória, verifica se é possível alocar o processo
+            elif(current[4] > 960):
+                current[3] = 0 # seta o tempo de processador igual a 0 para que o processo seja removido da fila
+            # se tiver espaço suficiente, aloca espaço e executa um quantum
+            else:
+                offset = memory.allocate_memory(current)
+                if(offset>=0): # offset é -1 quando não há espaço disponível
+                    processes.init_process(queues.priority1[0], offset) # inicia o processo
+                    processes.exec_process(queues.priority1[0]) # executa primeira instrução
+        elif(len(queues.priority2)>0): # prioridade 2
+            current = processes.get_process(queues.priority2[0])
             if(queues.priority2[0] in memory.mem):
-                queues.processes[queues.priority2[0]][3]-=1
-                queues.processes[queues.priority2[0]][1] = exec_time # atualiza o tempo inicial, que é usado para verificar se está ocorrendo starvation
-            elif(queues.processes[queues.priority2[0]][4] > 1000):
-                queues.processes[queues.priority2[0]][3] = 0
-            elif(memory.allocate_memory(queues.processes[queues.priority2[0]])):
-                queues.processes[queues.priority2[0]][3]-=1
-        elif(len(queues.priority3)>0):
+                processes.exec_process(queues.priority2[0])
+                current[1] = exec_time # atualiza o tempo inicial, que é usado para verificar se está ocorrendo starvation
+            elif(current[4] > 960):
+                current[3] = 0
+            else:
+                offset = memory.allocate_memory(current)
+                if(offset>=0):
+                    processes.init_process(queues.priority2[0], offset)
+                    processes.exec_process(queues.priority2[0])
+        elif(len(queues.priority3)>0): # prioridade 3
+            current = processes.get_process(queues.priority3[0])
             if(queues.priority3[0] in memory.mem):
-                queues.processes[queues.priority3[0]][3]-=1
-                queues.processes[queues.priority3[0]][1] = exec_time
-            elif(queues.processes[queues.priority3[0]][4] > 1000):
-                queues.processes[queues.priority3[0]][3] = 0
-            elif(memory.allocate_memory(queues.processes[queues.priority3[0]])):
-                queues.processes[queues.priority3[0]][3]-=1
+                processes.exec_process(queues.priority3[0])
+                current[1] = exec_time
+            elif(current[4] > 960):
+                current[3] = 0
+            else:
+                offset = memory.allocate_memory(current)
+                if(offset>=0):
+                    processes.init_process(queues.priority3[0], offset)
+                    processes.exec_process(queues.priority3[0])
 
         # atualiza a posição dos processos na fila
         queues.update_positions()
         # remove processos que já terminaram a execução
-        queues.finish_processes(memory)
+        queues.finish_processes(memory, processes.list)
         #atualiza a prioridade dos processos
-        queues.update_priorities(exec_time)
+        queues.update_priorities(exec_time, processes.list)
         exec_time+=1
-
-    processes = ProcessList("input/processes.txt")
 
     lines = files.readlines()
     # Inicializa o sistema de arquivos
@@ -88,7 +99,7 @@ def main(processes, files):
         system.pre_allocated_file(lines[2+x].split(', '))
     # Cria ou deleta arquivo
     for x in range(1, len(lines) - (1 + int(lines[1]))):
-        system.allocate_file(x, lines[1 + int(lines[1]) + x].split(', '), queues.processes)
+        system.allocate_file(x, lines[1 + int(lines[1]) + x].split(', '), processes.list)
     # Apresenta o disco contendo os arquivos, sendo que os espaços em 0 não possuem
     system.disk_ocupation()
 
