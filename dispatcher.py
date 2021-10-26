@@ -3,6 +3,7 @@ from queues import Queues as q
 from memory import Memory as mem
 from file_system import FileSystem as fs
 from process import ProcessList
+from resources import Resources as rsc
 
 def main(processes, files):
     exec_time = 0 # tempo de execução em segundos
@@ -10,6 +11,7 @@ def main(processes, files):
     memory = mem() # módulo de memória
     processes = ProcessList(processes) # módulo de processos
     queues = q() #módulo de filas
+    resource = rsc() #módulo de recurso
 
     init_processes = processes.__len__() # quantidade de processos a serem executados
 
@@ -52,10 +54,11 @@ def main(processes, files):
                 current[3] = 0 # seta o tempo de processador igual a 0 para que o processo seja removido da fila
             # se tiver espaço suficiente, aloca espaço e executa um quantum
             else:
-                offset = memory.allocate_memory(current)
-                if(offset>=0): # offset é -1 quando não há espaço disponível
-                    processes.init_process(queues.priority1[0], offset) # inicia o processo
-                    processes.exec_process(queues.priority1[0]) # executa primeira instrução
+                if(resource.get_resources(current)):
+                    offset = memory.allocate_memory(current)
+                    if(offset>=0): # offset é -1 quando não há espaço disponível
+                        processes.init_process(queues.priority1[0], offset) # inicia o processo
+                        processes.exec_process(queues.priority1[0]) # executa primeira instrução
         elif(len(queues.priority2)>0): # prioridade 2
             current = processes.get_process(queues.priority2[0])
             if(queues.priority2[0] in memory.mem):
@@ -64,10 +67,11 @@ def main(processes, files):
             elif(current[4] > 960):
                 current[3] = 0
             else:
-                offset = memory.allocate_memory(current)
-                if(offset>=0):
-                    processes.init_process(queues.priority2[0], offset)
-                    processes.exec_process(queues.priority2[0])
+                if(resource.get_resources(current)):
+                    offset = memory.allocate_memory(current)
+                    if(offset>=0):
+                        processes.init_process(queues.priority2[0], offset)
+                        processes.exec_process(queues.priority2[0])
         elif(len(queues.priority3)>0): # prioridade 3
             current = processes.get_process(queues.priority3[0])
             if(queues.priority3[0] in memory.mem):
@@ -76,10 +80,11 @@ def main(processes, files):
             elif(current[4] > 960):
                 current[3] = 0
             else:
-                offset = memory.allocate_memory(current)
-                if(offset>=0):
-                    processes.init_process(queues.priority3[0], offset)
-                    processes.exec_process(queues.priority3[0])
+                if(resource.get_resources(current)):
+                    offset = memory.allocate_memory(current)
+                    if(offset>=0):
+                        processes.init_process(queues.priority3[0], offset)
+                        processes.exec_process(queues.priority3[0])
 
         # atualiza a posição dos processos na fila
         queues.update_positions()
@@ -88,6 +93,9 @@ def main(processes, files):
         #atualiza a prioridade dos processos
         queues.update_priorities(exec_time, processes.list)
         exec_time+=1
+    
+    # libera os recursos
+    resource.free_resources()
 
     lines = files.readlines()
     # Inicializa o sistema de arquivos
