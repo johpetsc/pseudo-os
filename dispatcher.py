@@ -102,6 +102,7 @@ def main(processes, files):
         queues.finish_processes(memory, processes.list)
         #atualiza a prioridade dos processos
         queues.update_priorities(exec_time, processes.list)
+        # memory.free_memory()
         # libera os recursos
         resource.free_resources()
         exec_time+=1

@@ -45,6 +45,9 @@ class ProcessList(Sequence):
         self.list[index][3]-=1
         if(self.list[index][3] == 0): # testa se é a última instrução
             print("P{} return SIGINT\n".format(self.list[index][0]))
+
+    def __getitem__(self, index) -> list:
+        return self.list[index]
     
     def __len__(self) -> int:
         return len(self.list)
