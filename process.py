@@ -29,9 +29,13 @@ class ProcessList(Sequence):
         print("    blocks: {}".format(self.list[index][4]))
         print("    priority: {}".format(self.list[index][2]))
         print("    time: {}".format(self.list[index][3]))
+        if(self.list[index][5] > 1):
+            self.list[index][5] = 1
         print("    printers: {}".format(self.list[index][5]))
         print("    scanners: {}".format(self.list[index][6]))
         print("    modems: {}".format(self.list[index][7]))
+        if(self.list[index][8] > 1):
+            self.list[index][8] = 1
         print("    drivers: {}\n".format(self.list[index][8]))
 
     # executa uma instrução do processo
