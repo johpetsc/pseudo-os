@@ -1,49 +1,58 @@
-class Resources:
-    #inicializa os recursos
-    def __init__(self):
-        self.scanner = 0
-        self.modem = 0
-        self.disp_SATA = [0, 0]
-        self.impressoras = [0, 0]
+from collections.abc import Sequence
+from copy import deepcopy
 
-    #aloca o recurso para o processo 
-    #-retorna 1 se foi alocado com sucesso ou se nada foi pedido
-    #-retorna 0 se nao foi alocado com sucesso
-    def get_resources(self, process):
-        free_resources = 1
-        if (process[6] == 1) and (self.scanner != 0):
-            free_resources = 0
-        if (process[7] == 1) and (self.modem != 0):
-            free_resources = 0
-        if (process[8] == 1) and (self.disp_SATA[0] != 0):
-            free_resources = 0
-        if (process[8] == 2) and (self.disp_SATA[1] != 0):
-            free_resources = 0
-        if (process[5] == 1) and (self.impressoras[0] != 0):
-            free_resources = 0
-        if (process[5] == 2) and (self.impressoras[1] != 0):
-            free_resources = 0
-        
-        
-        if free_resources == 1:
-            if(process[6] == 1):
-                self.scanner = 1
-            if(process[7] == 1):
-                self.modem = 1
-            if(process[8] == 1):
-                self.disp_SATA[0] = 1
-            if(process[8] == 2):
-                self.disp_SATA[1] = 1
-            if(process[5] == 1):
-                self.impressora[0] = 1
-            if(process[5] == 2):
-                self.impressora[1] = 1
-        return free_resources
+class ProcessList(Sequence):
+    def __init__(self, filepath) -> None:
+        self.list = []
+        self.PID = 0
 
-    #libera todos os recursos utilizados pelo processo
-    def free_resources(self):
-        self.scanner = 0
-        self.modem = 0
-        self.disp_SATA = [0, 0]
-        self.impressoras = [0, 0]
+        with open(filepath, 'r') as f:
+            for line in f:
+                self.list.append(list(map(int, line.split(','))))
+        
+        # insere o PID do processo no início e quantidade de instruções executadas no final
+        for process in self.list:
+            process.insert(0, self.PID)
+            process.append(1)
+            self.PID+=1
+        
+        super().__init__()
     
+    def get_process(self, index) -> list:
+        return self.list[index]
+
+    # inicializa o processo
+    def init_process(self, index, offset):
+        print("\ndispatcher =>")
+        print("    PID: {}".format(self.list[index][0]))
+        print("    offset: {}".format(offset))
+        print("    blocks: {}".format(self.list[index][4]))
+        print("    priority: {}".format(self.list[index][2]))
+        print("    time: {}".format(self.list[index][3]))
+        if(self.list[index][5] > 1):
+            self.list[index][5] = 1
+        print("    printers: {}".format(self.list[index][5]))
+        print("    scanners: {}".format(self.list[index][6]))
+        print("    modems: {}".format(self.list[index][7]))
+        if(self.list[index][8] > 1):
+            self.list[index][8] = 1
+        print("    drivers: {}\n".format(self.list[index][8]))
+
+    # executa uma instrução do processo
+    def exec_process(self, index):
+        if(self.list[index][9] == 1): # testa se é a primeira instrução
+            print("process {}".format(self.list[index][0]))
+        print("P{} instruction {}".format(self.list[index][0], self.list[index][9]))
+        self.list[index][9]+=1
+        self.list[index][3]-=1
+        if(self.list[index][3] == 0): # testa se é a última instrução
+            print("P{} return SIGINT\n".format(self.list[index][0]))
+
+    def copy(self) -> 'ProcessList':
+        return deepcopy(self)
+
+    def __getitem__(self, index) -> list:
+        return self.list[index]
+    
+    def __len__(self) -> int:
+        return len(self.list)
