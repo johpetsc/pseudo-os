@@ -2,14 +2,13 @@ import sys
 from queues import Queues as q
 from memory import Memory as mem
 from file_system import FileSystem as fs
-from process import ProcessList
+from process import ProcessList as pl
 from resources import Resources as rsc
 
 def main(processes, files):
     exec_time = 0 # tempo de execução em segundos
-
     memory = mem() # módulo de memória
-    processes = ProcessList(processes) # módulo de processos
+    processes = pl(processes) # módulo de processos
     queues = q() #módulo de filas
     resource = rsc() #módulo de recurso
 
@@ -17,6 +16,7 @@ def main(processes, files):
 
     # loop principal, executa enquanto ainda existem processos não inicializados ou processos em alguma fila
     while(init_processes or queues.max != 1000):
+        prio = 0
         # verifica se o processos já está no tempo de inicialização  
         for process in processes.list:
             if(process[1] == exec_time):
@@ -40,11 +40,13 @@ def main(processes, files):
             else:
                 offset = memory.allocate_memory(current) # offset na alocação de memória
                 if(offset>=0): # offset é -1 quando não há espaço disponível
+                    print("\ndispatcher =>")
                     processes.init_process(queues.priority0[0], offset) # inicia o processo
                     processes.exec_process(queues.priority0[0]) # executa primeira instrução
 
         # processos de usuário
         if(len(queues.priority1)>0): # prioridade 1
+            prio = 1
             current = processes.get_process(queues.priority1[0])
             if(resource.get_resources(current)):
                 # verifica se o processo já está na memória e executa um quantum
@@ -58,9 +60,11 @@ def main(processes, files):
                 #if(resource.get_resources(current)):
                     offset = memory.allocate_memory(current)
                     if(offset>=0): # offset é -1 quando não há espaço disponível
+                        print("\ndispatcher =>")
                         processes.init_process(queues.priority1[0], offset) # inicia o processo
                         processes.exec_process(queues.priority1[0]) # executa primeira instrução
         elif(len(queues.priority2)>0): # prioridade 2
+            prio = 2
             current = processes.get_process(queues.priority2[0])
             if(resource.get_resources(current)):
                 if(queues.priority2[0] in memory.mem):
@@ -72,9 +76,11 @@ def main(processes, files):
                 #if(resource.get_resources(current)):
                     offset = memory.allocate_memory(current)
                     if(offset>=0):
+                        print("\ndispatcher =>")
                         processes.init_process(queues.priority2[0], offset)
                         processes.exec_process(queues.priority2[0])
         elif(len(queues.priority3)>0): # prioridade 3
+            prio = 3
             current = processes.get_process(queues.priority3[0])
             if(resource.get_resources(current)):
                 if(queues.priority3[0] in memory.mem):
@@ -86,19 +92,20 @@ def main(processes, files):
                 #if(resource.get_resources(current)):
                     offset = memory.allocate_memory(current)
                     if(offset>=0):
+                        print("\ndispatcher =>")
                         processes.init_process(queues.priority3[0], offset)
                         processes.exec_process(queues.priority3[0])
 
         # atualiza a posição dos processos na fila
-        queues.update_positions()
+        queues.update_positions(prio)
         # remove processos que já terminaram a execução
         queues.finish_processes(memory, processes.list)
         #atualiza a prioridade dos processos
         queues.update_priorities(exec_time, processes.list)
-        exec_time+=1
-    
         # libera os recursos
         resource.free_resources()
+        exec_time+=1
+    
 
     lines = files.readlines()
     # Inicializa o sistema de arquivos

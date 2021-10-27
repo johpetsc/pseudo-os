@@ -58,14 +58,14 @@ class Queues:
 
     # remove o primeiro processo da fila e envia para o final
     # não se aplica para prioridade 0 por ser uma fila FIFO
-    def update_positions(self):
-        if(len(self.priority1)>1):
+    def update_positions(self, prio):
+        if(len(self.priority1)>1 and prio == 1):
             process = self.priority1.pop(0)
             self.priority1.append(process)
-        if(len(self.priority2)>1):
+        if(len(self.priority2)>1 and prio == 2):
             process = self.priority2.pop(0)
             self.priority2.append(process)
-        if(len(self.priority3)>1):
+        if(len(self.priority3)>1 and prio == 3):
             process = self.priority3.pop(0)
             self.priority3.append(process)
 

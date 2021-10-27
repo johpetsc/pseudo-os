@@ -1,5 +1,4 @@
 from collections.abc import Sequence
-from copy import deepcopy
 
 class ProcessList(Sequence):
     def __init__(self, filepath) -> None:
@@ -23,7 +22,6 @@ class ProcessList(Sequence):
 
     # inicializa o processo
     def init_process(self, index, offset):
-        print("\ndispatcher =>")
         print("    PID: {}".format(self.list[index][0]))
         print("    offset: {}".format(offset))
         print("    blocks: {}".format(self.list[index][4]))
@@ -47,12 +45,6 @@ class ProcessList(Sequence):
         self.list[index][3]-=1
         if(self.list[index][3] == 0): # testa se é a última instrução
             print("P{} return SIGINT\n".format(self.list[index][0]))
-
-    def copy(self) -> 'ProcessList':
-        return deepcopy(self)
-
-    def __getitem__(self, index) -> list:
-        return self.list[index]
     
     def __len__(self) -> int:
         return len(self.list)
