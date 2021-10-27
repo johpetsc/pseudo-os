@@ -94,8 +94,8 @@ def main(processes, files):
         queues.update_priorities(exec_time, processes.list)
         exec_time+=1
     
-    # libera os recursos
-    resource.free_resources()
+        # libera os recursos
+        resource.free_resources()
 
     lines = files.readlines()
     # Inicializa o sistema de arquivos
