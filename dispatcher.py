@@ -46,41 +46,44 @@ def main(processes, files):
         # processos de usuário
         if(len(queues.priority1)>0): # prioridade 1
             current = processes.get_process(queues.priority1[0])
-            # verifica se o processo já está na memória e executa um quantum
-            if(queues.priority1[0] in memory.mem):
-                processes.exec_process(queues.priority1[0]) # executa instrução
-            # caso não esteja na memória, verifica se é possível alocar o processo
-            elif(current[4] > 960):
-                current[3] = 0 # seta o tempo de processador igual a 0 para que o processo seja removido da fila
-            # se tiver espaço suficiente, aloca espaço e executa um quantum
-            else:
-                if(resource.get_resources(current)):
+            if(resource.get_resources(current)):
+                # verifica se o processo já está na memória e executa um quantum
+                if(queues.priority1[0] in memory.mem):
+                    processes.exec_process(queues.priority1[0]) # executa instrução
+                # caso não esteja na memória, verifica se é possível alocar o processo
+                elif(current[4] > 960):
+                    current[3] = 0 # seta o tempo de processador igual a 0 para que o processo seja removido da fila
+                # se tiver espaço suficiente, aloca espaço e executa um quantum
+                else:
+                #if(resource.get_resources(current)):
                     offset = memory.allocate_memory(current)
                     if(offset>=0): # offset é -1 quando não há espaço disponível
                         processes.init_process(queues.priority1[0], offset) # inicia o processo
                         processes.exec_process(queues.priority1[0]) # executa primeira instrução
         elif(len(queues.priority2)>0): # prioridade 2
             current = processes.get_process(queues.priority2[0])
-            if(queues.priority2[0] in memory.mem):
-                processes.exec_process(queues.priority2[0])
-                current[1] = exec_time # atualiza o tempo inicial, que é usado para verificar se está ocorrendo starvation
-            elif(current[4] > 960):
-                current[3] = 0
-            else:
-                if(resource.get_resources(current)):
+            if(resource.get_resources(current)):
+                if(queues.priority2[0] in memory.mem):
+                    processes.exec_process(queues.priority2[0])
+                    current[1] = exec_time # atualiza o tempo inicial, que é usado para verificar se está ocorrendo starvation
+                elif(current[4] > 960):
+                    current[3] = 0
+                else:
+                #if(resource.get_resources(current)):
                     offset = memory.allocate_memory(current)
                     if(offset>=0):
                         processes.init_process(queues.priority2[0], offset)
                         processes.exec_process(queues.priority2[0])
         elif(len(queues.priority3)>0): # prioridade 3
             current = processes.get_process(queues.priority3[0])
-            if(queues.priority3[0] in memory.mem):
-                processes.exec_process(queues.priority3[0])
-                current[1] = exec_time
-            elif(current[4] > 960):
-                current[3] = 0
-            else:
-                if(resource.get_resources(current)):
+            if(resource.get_resources(current)):
+                if(queues.priority3[0] in memory.mem):
+                    processes.exec_process(queues.priority3[0])
+                    current[1] = exec_time
+                elif(current[4] > 960):
+                    current[3] = 0
+                else:
+                #if(resource.get_resources(current)):
                     offset = memory.allocate_memory(current)
                     if(offset>=0):
                         processes.init_process(queues.priority3[0], offset)
