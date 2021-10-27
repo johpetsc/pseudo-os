@@ -48,4 +48,5 @@ class Resources:
         self.modem = 0
         self.disp_SATA = [0, 0]
         self.impressoras = [0, 0]
+####
     
