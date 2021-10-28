@@ -37,9 +37,9 @@ class Resources:
             if(process[8] == 2):
                 self.disp_SATA[1] = 1
             if(process[5] == 1):
-                self.impressora[0] = 1
+                self.impressoras[0] = 1
             if(process[5] == 2):
-                self.impressora[1] = 1
+                self.impressoras[1] = 1
             return 1
 
     #libera todos os recursos utilizados pelo processo
@@ -48,4 +48,5 @@ class Resources:
         self.modem = 0
         self.disp_SATA = [0, 0]
         self.impressoras = [0, 0]
+####
     
