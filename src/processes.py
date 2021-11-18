@@ -9,7 +9,7 @@ class ProcessList(Sequence):
             for line in f:
                 self.list.append(list(map(int, line.split(','))))
         
-        # insere o PID do processo no início e quantidade de instruções executadas no final
+        # inserts the process PID at the start and number of executed instruction at the end
         for process in self.list:
             process.insert(0, self.PID)
             process.append(1)
@@ -20,7 +20,7 @@ class ProcessList(Sequence):
     def get_process(self, index) -> list:
         return self.list[index]
 
-    # inicializa o processo
+    # initializes the process
     def init_process(self, index, offset):
         print("    PID: {}".format(self.list[index][0]))
         print("    offset: {}".format(offset))
@@ -36,14 +36,14 @@ class ProcessList(Sequence):
             self.list[index][8] = 1
         print("    drivers: {}\n".format(self.list[index][8]))
 
-    # executa uma instrução do processo
+    # executes a process instruction
     def exec_process(self, index):
-        if(self.list[index][9] == 1): # testa se é a primeira instrução
+        if(self.list[index][9] == 1): # checks if first instruction
             print("process {}".format(self.list[index][0]))
         print("P{} instruction {}".format(self.list[index][0], self.list[index][9]))
         self.list[index][9]+=1
         self.list[index][3]-=1
-        if(self.list[index][3] == 0): # testa se é a última instrução
+        if(self.list[index][3] == 0): # checks if last instruction
             print("P{} return SIGINT\n".format(self.list[index][0]))
 
     def __getitem__(self, index) -> list:

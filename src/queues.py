@@ -4,9 +4,9 @@ class Queues:
         self.priority1 = []
         self.priority2 = []
         self.priority3 = []
-        self.max = 1000 # variável usada para verificar a quantidade de processos nas filas
+        self.max = 1000 # variable used to check the total number of processes in queues
 
-    # insere o processo na fila correspondente à prioridade
+    # inserts procees into the corresponding priority queue
     def create_queues(self, process):
         if process[2] == 0:
             self.priority0.append(process[0])
@@ -21,7 +21,7 @@ class Queues:
             self.priority3.append(process[0])
             self.max-=1
 
-    # print das filas, usar para debug
+    # print queues, use for debug
     def print_queues(self, exec_time):
         print("exec_time: {}".format(exec_time))
         print("p0:")
@@ -33,7 +33,7 @@ class Queues:
         print("p3:")
         print(self.priority3)
 
-    # remove os processos que tem o tempo de processador igual a 0
+    # removes the processes with processor time equal to 0
     def finish_processes(self, memory, processes):
         for p in self.priority0:
             if(processes[p][3] == 0):
@@ -56,8 +56,8 @@ class Queues:
                 self.priority3.remove(p)
                 self.max+=1
 
-    # remove o primeiro processo da fila e envia para o final
-    # não se aplica para prioridade 0 por ser uma fila FIFO
+    # removes the process at the start of the queues and moves it to the end
+    # does not apply to priority 0, which ia FIFO queue
     def update_positions(self, prio):
         if(len(self.priority1)>1 and prio == 1):
             process = self.priority1.pop(0)
@@ -69,8 +69,8 @@ class Queues:
             process = self.priority3.pop(0)
             self.priority3.append(process)
 
-    # processos que estão a 10 quantum sem serem executados sobem de prioridade
-    # não se aplica para processos com prioridade 0 e 1
+    # processes that have not been executed for 10 quantum have their priority increased
+    # does not apply for processes with priority 0 or 1
     def update_priorities(self, exec_time, processes):
         for p in self.priority2:
             if(exec_time - processes[p][1] > 10):

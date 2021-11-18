@@ -5,8 +5,8 @@ class Memory:
         self.mem = [None] * SIZE
         self.used_blocks = 0
 
-    # aloca os blocos de memória contiguos de um processo
-    # se não houver espaço suficiente, retorna 0
+    # allocates contiguous blocks for a process
+    # if not enough space, returns 0
     def allocate_memory(self, process):
         contiguous_blocks = 0
         allocated = 0
@@ -19,7 +19,7 @@ class Memory:
                 else:
                     contiguous_blocks = 0
                     start_block = x+1
-                if(contiguous_blocks == process[4]): # assim que encontra espaço suficiente, faz a alocação
+                if(contiguous_blocks == process[4]): # allocates as soon as enough space is found
                     allocated = 1
                     for x in range(start_block, start_block+contiguous_blocks):
                         self.mem[x] = process[0]
@@ -44,12 +44,9 @@ class Memory:
             if(not allocated):
                 return -1
 
-    # remove processo da memória
+    # removes process from memory
     def free_memory(self, process):
         for x in range(0, SIZE):
             if(self.mem[x] == process[0]):
                 self.mem[x] = None
-        # caso seja necessário limpar a memória depois de cada quantum
-        # for x in range(0, SIZE):
-        #     self.mem[x] = None
 
